@@ -417,7 +417,10 @@ class Minty {
         // Ask the remote service to pin the content.
         // Behind the scenes, this will cause the pinning service to connect to our local IPFS node
         // and fetch the data using Bitswap, IPFS's transfer protocol.
-        await this.ipfs.pin.remote.add(cid, { service: config.pinningService.name })
+        await this.ipfs.pin.remote.add(cid, {
+            service: config.pinningService.name, 
+            background: false
+        })
     }
 
 
