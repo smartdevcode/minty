@@ -149,12 +149,10 @@ minty pin 1
 > 🌿 Pinned all data for token id 1
 ```
 
-The `pin` command looks for a JWT access token from [Pinata](https://pinata.cloud) in the `PINATA_API_TOKEN` environment variable. Once you've obtained a token from Pinata, make a file in the `config` directory called `default.env`, and edit it to look like this, with your JWT token inside the quote marks:
+The `pin` command looks for a JWT access token from [Pinata](https://pinata.cloud) in the `PINATA_API_TOKEN` environment variable. Once you've obtained a token from Pinata, you can set it with a command like:
 
 ```shell
-PINATA_API_TOKEN="Paste your Pinata JWT token inside the quotes!"
+export PINATA_API_TOKEN="paste token here"
 ```
-
-Now Minty will be able to pin things to your Pinata account!
 
 If you'd prefer to use a different pinning service, you can edit the configuration in `config/default.js`.
