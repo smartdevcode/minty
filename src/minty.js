@@ -16,6 +16,11 @@ const { loadDeploymentInfo } = require('./deploy')
 // different environments (e.g. testnet, mainnet, staging, production, etc).
 const config = require('getconfig')
 
+// ipfs.add parameters for more deterministic CIDs
+const ipfsAddOptions = {
+  cidVersion: 1,
+  hashAlg: 'sha2-256'
+}
 
 /**
  * Construct and asynchronously initialize a new Minty instance.
@@ -101,14 +106,14 @@ class Minty {
         // 'ipfs://QmaNZ2FCgvBPqnxtkbToVVbK2Nes6xk5K4Ns6BsmkPucAM/cat-pic.png' instead of
         // 'ipfs://QmaNZ2FCgvBPqnxtkbToVVbK2Nes6xk5K4Ns6BsmkPucAM'
         const ipfsPath = '/nft/' + basename
-        const { cid: assetCid } = await this.ipfs.add({ path: ipfsPath, content })
+        const { cid: assetCid } = await this.ipfs.add({ path: ipfsPath, content }, ipfsAddOptions)
 
         // make the NFT metadata JSON
         const assetURI = ensureIpfsUriPrefix(assetCid) + '/' + basename
         const metadata = await this.makeNFTMetadata(assetURI, options)
 
         // add the metadata to IPFS
-        const { cid: metadataCid } = await this.ipfs.add({ path: '/nft/metadata.json', content: JSON.stringify(metadata)} )
+        const { cid: metadataCid } = await this.ipfs.add({ path: '/nft/metadata.json', content: JSON.stringify(metadata)}, ipfsAddOptions)
         const metadataURI = ensureIpfsUriPrefix(metadataCid) + '/metadata.json'
 
         // get the address of the token owner from options, or use the default signing address if no owner is given
@@ -493,15 +498,10 @@ class Minty {
 }
 
 function ensureIpfsUriPrefix(cidOrURI) {
-    let uri = cidOrURI.toString()
-    if (!uri.startsWith('ipfs://')) {
-        uri = 'ipfs://' + cidOrURI
+    if (!cidOrURI.toString().startsWith('ipfs://')) {
+        return 'ipfs://' + cidOrURI
     }
-    // Avoid the Nyan Cat bug (https://github.com/ipfs/go-ipfs/pull/7930)
-    if (uri.startsWith('ipfs://ipfs/')) {
-      uri = uri.replace('ipfs://ipfs/', 'ipfs://')
-    }
-    return uri
+    return cidOrURI.toString()
 }
 
 /**
